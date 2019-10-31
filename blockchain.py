@@ -13,7 +13,7 @@ class Blockchain:
          self.chain = []
          self.create_block(proof = 1, previous_hash = '0')
      
-     def creat_block(self, proof, previous_hash):
+     def create_block(self, proof, previous_hash):
         block = {'index': len(self.chain)+1, 
                  'timestamp': str(datetime.datetime.now()),
                  'proof': proof,
@@ -70,7 +70,7 @@ def mine_block():
     previous_proof = previous_block['proof']
     proof = blockchain.proof_of_work(previous_proof)
     previous_hash = blockchain.hash(previous_block)
-    block = blockchain.creat_block(proof, previous_hash)
+    block = blockchain.create_block(proof, previous_hash)
     response = {'message': 'Congratulations, you just mined a block!',
                 'index': block['index'],
                 'timestamp': block['timestamp'],
@@ -84,3 +84,6 @@ def get_chain():
     response = {'chain': blockchain.chain,
                'length': len(blockchain.chain)}
     return jsonify(response), 200
+
+# Running the app
+app.run(host = '0.0.0.0', port = 5000)
