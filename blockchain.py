@@ -1,4 +1,4 @@
-on ا # Module 1 Create a blockchain
+# Module 1 Create a blockchain
 
 import datetime
 import hashlib
@@ -13,7 +13,7 @@ class Blockchain:
          self.chain = []
          self.create_block(proof = 1, previous_hash = '0')
      
-    def creat_block(self, proof, previous_hash):
+     def creat_block(self, proof, previous_hash):
         block = {'index': len(self.chain)+1, 
                  'timestamp': str(datetime.datetime.now()),
                  'proof': proof,
@@ -21,10 +21,10 @@ class Blockchain:
         self.chain.append(block)
         return block
 
-    def get_previous_block(self):
+     def get_previous_block(self):
         return self.chain[-1];
     
-    def proof_of_work(self, previous_proof):
+     def proof_of_work(self, previous_proof):
         new_proof = 1
         check_proof = False
         while(check_proof is False):
@@ -35,11 +35,11 @@ class Blockchain:
                 new_proof += 1
         return new_proof
     
-    def hash(self, block):
+     def hash(self, block):
         encoded_block = json.dumps(block, sort_keys = True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
     
-    def is_chain_valid(self, chain):
+     def is_chain_valid(self, chain):
         previous_block = chain[0]
         block_index = 1
         while block_index < len(chain):
@@ -50,9 +50,30 @@ class Blockchain:
             proof = block['proof']
             hash_operation = hashlib.sha256(str(proof**2 - previous_proof**2).encode()).hexdigest()
             if hash_operation[:4] != '0000':
-                check_proof = False
+                return False
             previous_block = block
             block_index +=1 
         return True
 
 # Part 2 - Mining our Blockchain
+        
+# Creating a Web App
+app = Flask(__name__)
+
+# Creating a Blockchain
+blockchain = Blockchain()
+
+# Mining a new block
+@app.route('/mine_block', methods=['GET'])
+def mine_block():
+    previous_block = blockchain.get_previous_block()
+    previous_proof = previous_block['proof']
+    proof = blockchain.proof_of_work(previous_proof)
+    previous_hash = blockchain.hash(previous_block)
+    block = blockchain.creat_block(proof, previous_hash)
+    response = {'message': 'Congratulations, you just mined a block!',
+                'index': block['index'],
+                'timestamp': block['timestamp'],
+                'proof': block['proof'],
+                'previous_hash': block['previous_hash']}
+    return jsonify(response), 200
