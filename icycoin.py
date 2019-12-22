@@ -127,7 +127,11 @@ def get_chain():
 
 @app.route('/is_valid', methods = ['GET'])
 def is_valid():
-    response = {'message': blockchain.is_chain_valid(blockchain.chain)}
+    is_valid = blockchain.is_chain_valid(blockchain.chain)
+    if is_valid:   
+        response = {'message': 'All good. The Blockchain is Valid'}
+    else:
+        response = {'message': 'Houston, we have a problem. The Blockchain is no longer valid'}        
     return jsonify(response), 200
 
 # Adding a new transaction to the Blockchain
@@ -154,5 +158,17 @@ def connect_node():
     response = {'message': 'All the nodes are now connected. The IcyCoin Blockchain now contains the following nodes',
                 'total_nodes': list(blockchain.nodes)}
     return jsonify(response), 201
+
+# Replacing the chain with the longest one
+@app.route('/replace_chain', methods = ['GET'])
+def replace_chain():
+    is_chain_replaced = blockchain.replace_chain()
+    if is_chain_replaced:
+        response = {'message': 'The nodes had different chains so the chain was replaced by the longest one.',
+                    'new_chain': blockchain.chain}
+    else:
+        response = {'message': 'All good. The chain is the largest one',
+                    'actual_chain': blockchain.chain}        
+    return jsonify(response), 200
 # Running the app
 app.run(host = '0.0.0.0', port = 5000)
